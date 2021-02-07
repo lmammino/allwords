@@ -1,24 +1,97 @@
+//! `allwords` is a crate that allows you to generate words over a given alphabet.
+//!
+//! For instance if you want to generate all the possible words containing `"a"`, `"b"`, `"c"` with
+//! a maximum length of 3 chars:
+//!
+//! ```rust
+//! use allwords::{Alphabet};
+//!
+//! let a = Alphabet::from_chars_in_str("abc").unwrap();
+//!
+//! let words: Vec<String> = a.all_words(Some(3)).collect();
+//!
+//! let expected_words: Vec<String> = [
+//!     "a", "b", "c",
+//!     "aa", "ab", "ac", "ba", "bb", "bc", "ca", "cb", "cc",
+//!     "aaa", "aab", "aac", "aba", "abb", "abc", "aca", "acb", "acc",
+//!     "baa", "bab", "bac", "bba", "bbb", "bbc", "bca", "bcb", "bcc",
+//!     "caa", "cab", "cac", "cba", "cbb", "cbc", "cca", "ccb", "ccc"]
+//!     .iter()
+//!     .map(|s| s.to_string())
+//!     .collect();
+//!
+//! assert_eq!(words, expected_words);
+//! ```
+//!
+//! This is something that can be useful in a number of situations, for instance
+//! pseudo-random data generation or brute forcing.
+
 use std::collections::{HashMap, VecDeque};
 use std::str;
 
+/// A representation of an alphabet
 pub struct Alphabet {
-    next_char_map: HashMap<char, Option<char>>,
-    first_char: char,
+    /// An hashmap used to track what's the next character for every given character.
+    /// The last caracter will point to None.
+    pub next_char_map: HashMap<char, Option<char>>,
+    /// The first character in the alphabet
+    pub first_char: char,
 }
 
-pub struct AlphabetIterator<'a> {
-    alphabet: &'a Alphabet,
+/// A iterator that can generate words for a given alphabet
+pub struct WordsIterator<'a> {
+    /// The reference alphabet instance
+    pub alphabet: &'a Alphabet,
     max_len: Option<usize>,
     next_item: String,
 }
 
 impl Alphabet {
-    pub fn from_chars_string<T: AsRef<str>>(alphabet: T) -> Result<Self, String> {
+    /// Creates a new alphabet starting from the unique characters found in a given string.
+    ///
+    /// This function will extract all the unique characters found in order in the given string.
+    /// It will return an `Err` if there are less than 2 unique characters in the given string.
+    ///
+    /// # Arguments
+    ///
+    /// * `alphabet_str` - A string-like instance that contains the sequence of characters that
+    ///     we want to use to initialize our `Alphabet` instance
+    ///
+    /// # Returns
+    ///
+    /// It returns a Result containing the new `Alphabet` instance in case of success.
+    ///
+    /// # Examples
+    ///
+    /// Creates an alphabet using characters from `'a'` to `'f'`:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let alphabet = Alphabet::from_chars_in_str("abcdef").unwrap();
+    /// ```
+    ///
+    /// Passing an empty string or a string with less than 2 unique chars will return an error:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let a = Alphabet::from_chars_in_str("zzzzzzzzzzzzzz");
+    ///
+    /// match a {
+    ///     Ok(_) => panic!("An alphabet was created when we expected an error"),
+    ///     Err(e) => assert_eq!(
+    ///         e,
+    ///         String::from("Invalid alphabet string. Found less than 2 unique chars")
+    ///     ),
+    /// };
+    /// ```
+    pub fn from_chars_in_str<T: AsRef<str>>(alphabet_str: T) -> Result<Self, String> {
         let mut next_char_map = HashMap::new();
         let mut first_char: Option<char> = None;
 
         let mut previous_char: Option<char> = None;
-        for c in alphabet.as_ref().chars() {
+        for c in alphabet_str.as_ref().chars() {
             if first_char.is_none() {
                 first_char = Some(c);
                 previous_char = Some(c);
@@ -31,8 +104,8 @@ impl Alphabet {
             }
         }
         // adds last char if hasn't been added yet
-        if previous_char.is_some() && !next_char_map.contains_key(&previous_char.unwrap()) {
-            next_char_map.insert(previous_char.unwrap(), None);
+        if let Some(pc) = previous_char {
+            next_char_map.entry(pc).or_insert(None);
         }
 
         if next_char_map.keys().len() < 2 {
@@ -47,40 +120,70 @@ impl Alphabet {
         })
     }
 
-    pub fn all_words<'a>(&'a self, max_len: Option<usize>) -> AlphabetIterator<'a> {
-        AlphabetIterator {
+    /// Creates an iterator that will generate all the words for a given alphabet. You can optionally
+    /// specifify a maximum length, after which, the iterator will terminate.
+    ///
+    /// # Arguments
+    ///
+    /// * `max_len` - an optional `usize` that, if present, will specify the maximum length of the
+    ///     generated string. If `None` the iterator will be endless.
+    ///
+    /// # Returns
+    ///
+    /// An instance of a [`WordsIterator`].
+    ///
+    /// # Examples
+    ///
+    /// Creates an iterator with `max_len` = `2` for a given alphabet:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let alphabet = Alphabet::from_chars_in_str("01").unwrap();
+    /// let iterator = alphabet.all_words(Some(2));
+    /// let words: Vec<String> = iterator.collect();
+    /// assert_eq!(words, vec!["0", "1", "00", "01", "10", "11"]);
+    /// ```
+    pub fn all_words(&self, max_len: Option<usize>) -> WordsIterator {
+        WordsIterator {
             alphabet: self,
             max_len,
             next_item: String::from(self.first_char),
         }
     }
 
-    pub fn all_words_unbound<'a>(&'a self) -> AlphabetIterator<'a> {
-        AlphabetIterator {
+    /// A shortcut for creating an unbound (endless) iterator for the given alphabet.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let alphabet = Alphabet::from_chars_in_str("01").unwrap();
+    /// let iterator = alphabet.all_words_unbound(); // equivalent to `alphabet.all_words(None)`
+    /// ```
+    pub fn all_words_unbound(&self) -> WordsIterator {
+        WordsIterator {
             alphabet: self,
             max_len: None,
             next_item: String::from(self.first_char),
         }
     }
 
-    pub fn all_words_from<'a>(
-        &'a self,
+    pub fn all_words_starting_from(
+        &self,
         start_word: String,
         max_len: Option<usize>,
-    ) -> AlphabetIterator<'a> {
-        AlphabetIterator {
+    ) -> WordsIterator {
+        WordsIterator {
             alphabet: self,
             max_len,
             next_item: start_word,
         }
     }
 
-    pub fn all_words_from_len<'a>(
-        &'a self,
-        start_len: usize,
-        max_len: Option<usize>,
-    ) -> AlphabetIterator<'a> {
-        AlphabetIterator {
+    pub fn all_words_with_len(&self, start_len: usize, max_len: Option<usize>) -> WordsIterator {
+        WordsIterator {
             alphabet: self,
             max_len,
             next_item: (0..start_len).map(|_| self.first_char).collect::<String>(),
@@ -88,7 +191,7 @@ impl Alphabet {
     }
 }
 
-impl<'a> Iterator for AlphabetIterator<'a> {
+impl<'a> Iterator for WordsIterator<'a> {
     type Item = String;
 
     fn next(&mut self) -> Option<String> {
@@ -131,159 +234,9 @@ impl str::FromStr for Alphabet {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Alphabet::from_chars_string(&String::from(s))
+        Alphabet::from_chars_in_str(&String::from(s))
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use std::collections::HashSet;
-
-    #[test]
-    fn it_creates_an_alphabet_from_a_string_with_few_unique_chars() {
-        let a = Alphabet::from_chars_string("ab").unwrap();
-
-        let expected_map: HashMap<char, Option<char>> =
-            [('a', Some('b')), ('b', None)].iter().cloned().collect();
-
-        assert_eq!(a.first_char, 'a');
-        assert_eq!(a.next_char_map, expected_map);
-    }
-
-    #[test]
-    fn it_creates_an_alphabet_from_a_string_with_many_unique_chars() {
-        let a = Alphabet::from_chars_string("abcde").unwrap();
-
-        let expected_map: HashMap<char, Option<char>> = [
-            ('a', Some('b')),
-            ('b', Some('c')),
-            ('c', Some('d')),
-            ('d', Some('e')),
-            ('e', None),
-        ]
-        .iter()
-        .cloned()
-        .collect();
-
-        assert_eq!(a.first_char, 'a');
-        assert_eq!(a.next_char_map, expected_map);
-    }
-
-    #[test]
-    fn it_creates_an_alphabet_from_a_string_with_duplicate_chars() {
-        let a = Alphabet::from_chars_string("aaabbbcccddddebbbeeea").unwrap();
-
-        let expected_map: HashMap<char, Option<char>> = [
-            ('a', Some('b')),
-            ('b', Some('c')),
-            ('c', Some('d')),
-            ('d', Some('e')),
-            ('e', None),
-        ]
-        .iter()
-        .cloned()
-        .collect();
-
-        assert_eq!(a.first_char, 'a');
-        assert_eq!(a.next_char_map, expected_map);
-    }
-
-    #[test]
-    fn it_creates_an_alphabet_from_a_string_with_unicode_chars() {
-        let a = Alphabet::from_chars_string("😀😃😄😁😅").unwrap();
-
-        let expected_map: HashMap<char, Option<char>> = [
-            ('😀', Some('😃')),
-            ('😃', Some('😄')),
-            ('😄', Some('😁')),
-            ('😁', Some('😅')),
-            ('😅', None),
-        ]
-        .iter()
-        .cloned()
-        .collect();
-
-        assert_eq!(a.first_char, '😀');
-        assert_eq!(a.next_char_map, expected_map);
-    }
-
-    #[test]
-    fn it_fails_if_alphabet_doesnt_have_at_least_2_unique_chars() {
-        let a = Alphabet::from_chars_string("");
-
-        match a {
-            Ok(_) => assert!(false),
-            Err(e) => assert_eq!(
-                e,
-                String::from("Invalid alphabet string. Found less than 2 unique chars")
-            ),
-        };
-
-        let a = Alphabet::from_chars_string("aaaaaaaaaaa");
-
-        match a {
-            Ok(_) => assert!(false),
-            Err(e) => assert_eq!(
-                e,
-                String::from("Invalid alphabet string. Found less than 2 unique chars")
-            ),
-        };
-    }
-
-    #[test]
-    fn it_can_generate_all_words_up_to_a_certain_length() {
-        let a = Alphabet::from_chars_string("01").unwrap();
-
-        let words: Vec<String> = a.all_words(Some(3)).collect();
-
-        let expected_words: Vec<String> = [
-            "0", "1", "00", "01", "10", "11", "000", "001", "010", "011", "100", "101", "110",
-            "111",
-        ]
-        .iter()
-        .map(|s| s.to_string())
-        .collect();
-
-        assert_eq!(words, expected_words);
-    }
-
-    #[test]
-    fn it_can_generate_all_words_endlessly() {
-        let a = Alphabet::from_chars_string("ab").unwrap();
-
-        // testing infinite is... tough :) so we just limit this to 1000 items and check that they are all different
-        let words: Vec<String> = a.all_words_unbound().take(1000).collect();
-        let unique_words: HashSet<String> = words.iter().cloned().collect();
-
-        assert_eq!(unique_words.len(), 1000);
-    }
-
-    #[test]
-    fn it_can_generate_all_words_up_to_a_certain_length_from_a_starting_string() {
-        let a = Alphabet::from_chars_string("01").unwrap();
-
-        let words: Vec<String> = a.all_words_from(String::from("011"), Some(3)).collect();
-
-        let expected_words: Vec<String> = ["011", "100", "101", "110", "111"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
-
-        assert_eq!(words, expected_words);
-    }
-
-    #[test]
-    fn it_can_generate_all_words_from_a_given_length_up_to_another_length() {
-        let a = Alphabet::from_chars_string("01").unwrap();
-
-        let words: Vec<String> = a.all_words_from_len(3, Some(3)).collect();
-
-        let expected_words: Vec<String> = ["000", "001", "010", "011", "100", "101", "110", "111"]
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
-
-        assert_eq!(words, expected_words);
-    }
-}
+mod test;
