@@ -50,7 +50,7 @@ impl Alphabet {
     pub fn all_words<'a>(&'a self, max_len: Option<usize>) -> AlphabetIterator<'a> {
         AlphabetIterator {
             alphabet: self,
-            max_len: max_len,
+            max_len,
             next_item: String::from(self.first_char),
         }
     }
@@ -70,7 +70,7 @@ impl Alphabet {
     ) -> AlphabetIterator<'a> {
         AlphabetIterator {
             alphabet: self,
-            max_len: max_len,
+            max_len,
             next_item: start_word,
         }
     }
@@ -82,7 +82,7 @@ impl Alphabet {
     ) -> AlphabetIterator<'a> {
         AlphabetIterator {
             alphabet: self,
-            max_len: max_len,
+            max_len,
             next_item: (0..start_len).map(|_| self.first_char).collect::<String>(),
         }
     }
