@@ -185,7 +185,8 @@ impl Alphabet {
     /// if you want to distribute computation across indepentend processes or threads.
     ///
     /// **Note:** this method does not check that the starting word complies with the alphabet. If there are characters
-    /// in the string that are present in the alphabet, the iterator will crash.
+    /// in the string that are NOT present in the alphabet, the iterator will consider these characters as last character and
+    /// restart the sequence from the first character in the alphabet.
     ///
     /// # Arguments
     ///
@@ -222,6 +223,31 @@ impl Alphabet {
         }
     }
 
+    /// Creates an iterator that will generate all the words for a given alphabet starting from the first word with
+    /// a given minimum length.
+    ///
+    /// # Arguments
+    ///
+    /// * `start_len` - a `usize` defining the minimum length of the first word emitted by the iterator.
+    /// * `max_len` - an optional `usize` that, if present, will specify the maximum length of the
+    ///     generated string. If `None` the iterator will be endless.
+    ///
+    /// # Returns
+    ///
+    /// An instance of a [`WordsIterator`].
+    ///
+    /// # Examples
+    ///
+    /// Creates an iterator for all the words with length bethween 2 and 3 chars:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let alphabet = Alphabet::from_chars_in_str("01").unwrap();
+    /// let iterator = alphabet.all_words_with_len(2, Some(3));
+    /// let words: Vec<String> = iterator.collect();
+    /// assert_eq!(words, vec!["00", "01", "10", "11", "000", "001", "010", "011", "100", "101", "110", "111"]);
+    /// ```
     pub fn all_words_with_len(&self, start_len: usize, max_len: Option<usize>) -> WordsIterator {
         WordsIterator {
             alphabet: self,

@@ -148,6 +148,23 @@ fn it_can_generate_all_words_up_to_a_certain_length_from_a_starting_string() {
 }
 
 #[test]
+fn it_can_generate_all_words_up_to_a_certain_length_from_a_starting_string_that_does_not_comply_to_the_alphabet(
+) {
+    let a = Alphabet::from_chars_in_str("01").unwrap();
+
+    let words: Vec<String> = a
+        .all_words_starting_from(String::from("021"), Some(3))
+        .collect();
+
+    let expected_words: Vec<String> = ["021", "100", "101", "110", "111"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+
+    assert_eq!(words, expected_words);
+}
+
+#[test]
 fn it_can_generate_all_words_from_a_given_length_up_to_another_length() {
     let a = Alphabet::from_chars_in_str("01").unwrap();
 
