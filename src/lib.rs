@@ -86,6 +86,15 @@ impl Alphabet {
     ///     ),
     /// };
     /// ```
+    ///
+    /// Since `Alphabet` implements `str::FromStr`, you can also do the following:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let value = "abcdef";
+    /// let alphabet = value.parse::<Alphabet>().unwrap(); // long life to the turbofish!
+    /// ```
     pub fn from_chars_in_str<T: AsRef<str>>(alphabet_str: T) -> Result<Self, String> {
         let mut next_char_map = HashMap::new();
         let mut first_char: Option<char> = None;
