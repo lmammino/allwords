@@ -47,6 +47,14 @@ impl Alphabet {
         })
     }
 
+    pub fn all_words<'a>(&'a self, max_len: Option<usize>) -> AlphabetIterator<'a> {
+        AlphabetIterator {
+            alphabet: self,
+            max_len: max_len,
+            next_item: String::from(self.first_char),
+        }
+    }
+
     pub fn all_words_unbound<'a>(&'a self) -> AlphabetIterator<'a> {
         AlphabetIterator {
             alphabet: self,
@@ -55,11 +63,27 @@ impl Alphabet {
         }
     }
 
-    pub fn all_words<'a>(&'a self, max_len: usize) -> AlphabetIterator<'a> {
+    pub fn all_words_from<'a>(
+        &'a self,
+        start_word: String,
+        max_len: Option<usize>,
+    ) -> AlphabetIterator<'a> {
         AlphabetIterator {
             alphabet: self,
-            max_len: Some(max_len),
-            next_item: String::from(self.first_char),
+            max_len: max_len,
+            next_item: start_word,
+        }
+    }
+
+    pub fn all_words_from_len<'a>(
+        &'a self,
+        start_len: usize,
+        max_len: Option<usize>,
+    ) -> AlphabetIterator<'a> {
+        AlphabetIterator {
+            alphabet: self,
+            max_len: max_len,
+            next_item: (0..start_len).map(|_| self.first_char).collect::<String>(),
         }
     }
 }
@@ -119,7 +143,7 @@ mod tests {
     #[test]
     fn it_creates_an_alphabet_from_a_string_with_few_unique_chars() {
         let a = Alphabet::from_chars_string("ab").unwrap();
-        
+
         let expected_map: HashMap<char, Option<char>> =
             [('a', Some('b')), ('b', None)].iter().cloned().collect();
 
@@ -130,7 +154,7 @@ mod tests {
     #[test]
     fn it_creates_an_alphabet_from_a_string_with_many_unique_chars() {
         let a = Alphabet::from_chars_string("abcde").unwrap();
-        
+
         let expected_map: HashMap<char, Option<char>> = [
             ('a', Some('b')),
             ('b', Some('c')),
@@ -149,7 +173,7 @@ mod tests {
     #[test]
     fn it_creates_an_alphabet_from_a_string_with_duplicate_chars() {
         let a = Alphabet::from_chars_string("aaabbbcccddddebbbeeea").unwrap();
-        
+
         let expected_map: HashMap<char, Option<char>> = [
             ('a', Some('b')),
             ('b', Some('c')),
@@ -168,7 +192,7 @@ mod tests {
     #[test]
     fn it_creates_an_alphabet_from_a_string_with_unicode_chars() {
         let a = Alphabet::from_chars_string("😀😃😄😁😅").unwrap();
-        
+
         let expected_map: HashMap<char, Option<char>> = [
             ('😀', Some('😃')),
             ('😃', Some('😄')),
@@ -187,7 +211,7 @@ mod tests {
     #[test]
     fn it_fails_if_alphabet_doesnt_have_at_least_2_unique_chars() {
         let a = Alphabet::from_chars_string("");
-        
+
         match a {
             Ok(_) => assert!(false),
             Err(e) => assert_eq!(
@@ -195,9 +219,9 @@ mod tests {
                 String::from("Invalid alphabet string. Found less than 2 unique chars")
             ),
         };
-        
+
         let a = Alphabet::from_chars_string("aaaaaaaaaaa");
-        
+
         match a {
             Ok(_) => assert!(false),
             Err(e) => assert_eq!(
@@ -210,8 +234,8 @@ mod tests {
     #[test]
     fn it_can_generate_all_words_up_to_a_certain_length() {
         let a = Alphabet::from_chars_string("01").unwrap();
-        
-        let words: Vec<String> = a.all_words(3).collect();
+
+        let words: Vec<String> = a.all_words(Some(3)).collect();
 
         let expected_words: Vec<String> = [
             "0", "1", "00", "01", "10", "11", "000", "001", "010", "011", "100", "101", "110",
@@ -227,11 +251,39 @@ mod tests {
     #[test]
     fn it_can_generate_all_words_endlessly() {
         let a = Alphabet::from_chars_string("ab").unwrap();
-        
+
         // testing infinite is... tough :) so we just limit this to 1000 items and check that they are all different
         let words: Vec<String> = a.all_words_unbound().take(1000).collect();
-        let unique_words: HashSet<String> = words.iter().cloned().collect(); 
-        
+        let unique_words: HashSet<String> = words.iter().cloned().collect();
+
         assert_eq!(unique_words.len(), 1000);
+    }
+
+    #[test]
+    fn it_can_generate_all_words_up_to_a_certain_length_from_a_starting_string() {
+        let a = Alphabet::from_chars_string("01").unwrap();
+
+        let words: Vec<String> = a.all_words_from(String::from("011"), Some(3)).collect();
+
+        let expected_words: Vec<String> = ["011", "100", "101", "110", "111"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+
+        assert_eq!(words, expected_words);
+    }
+
+    #[test]
+    fn it_can_generate_all_words_from_a_given_length_up_to_another_length() {
+        let a = Alphabet::from_chars_string("01").unwrap();
+
+        let words: Vec<String> = a.all_words_from_len(3, Some(3)).collect();
+
+        let expected_words: Vec<String> = ["000", "001", "010", "011", "100", "101", "110", "111"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+
+        assert_eq!(words, expected_words);
     }
 }
