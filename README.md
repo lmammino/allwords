@@ -5,7 +5,13 @@
 [![crates.io badge](https://img.shields.io/crates/v/allwords.svg)](https://crates.io/crates/allwords)
 [![Documentation](https://docs.rs/allwords/badge.svg)](https://docs.rs/allwords)
 
-TODO: expand with a better description and more examples
+TODO: BEFORE PUBLISH
+
+  - [ ] expand README with a better description and more examples
+  - [ ] cleanup clippy errors
+  - [ ] make CI work
+  - [ ] add publish workflow
+  - [ ] add code docs
 
 
 ## Usage
