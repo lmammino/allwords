@@ -4,7 +4,6 @@
 [![codecov](https://codecov.io/gh/lmammino/allwords/branch/master/graph/badge.svg)](https://codecov.io/gh/lmammino/allwords)
 [![crates.io badge](https://img.shields.io/crates/v/allwords.svg)](https://crates.io/crates/allwords)
 [![Documentation](https://docs.rs/allwords/badge.svg)](https://docs.rs/allwords)
-[![License: MIT](https://img.shields.io/crates/l/allwords.svg)](#license)
 
 TODO: expand with a better description and more examples
 
