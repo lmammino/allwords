@@ -13,6 +13,18 @@ fn it_creates_an_alphabet_from_a_string_with_few_unique_chars() {
 }
 
 #[test]
+fn it_creates_an_alphabet_using_string_parse() {
+    let value = "ab";
+    let a = value.parse::<Alphabet>().unwrap();
+
+    let expected_map: HashMap<char, Option<char>> =
+        [('a', Some('b')), ('b', None)].iter().cloned().collect();
+
+    assert_eq!(a.first_char, 'a');
+    assert_eq!(a.next_char_map, expected_map);
+}
+
+#[test]
 fn it_creates_an_alphabet_from_a_string_with_many_unique_chars() {
     let a = Alphabet::from_chars_in_str("abcde").unwrap();
 

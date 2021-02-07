@@ -96,6 +96,7 @@ impl Alphabet {
     /// let alphabet = value.parse::<Alphabet>().unwrap(); // long life to the turbofish!
     /// ```
     pub fn from_chars_in_str<T: AsRef<str>>(alphabet_str: T) -> Result<Self, String> {
+        // creates the map of next characters removing duplicates
         let mut next_char_map = HashMap::new();
         let mut first_char: Option<char> = None;
 
@@ -179,6 +180,36 @@ impl Alphabet {
         }
     }
 
+    /// Creates an iterator that will generate all the words for a given alphabet starting from a given word.
+    /// This method can be useful in case you want to restart a partially completed iteration from another execution or
+    /// if you want to distribute computation across indepentend processes or threads.
+    ///
+    /// **Note:** this method does not check that the starting word complies with the alphabet. If there are characters
+    /// in the string that are present in the alphabet, the iterator will crash.
+    ///
+    /// # Arguments
+    ///
+    /// * `start_word` - a `String` instance representing the starting string. This string will be returned by the
+    ///     first `.next()` call to the iterator).
+    /// * `max_len` - an optional `usize` that, if present, will specify the maximum length of the
+    ///     generated string. If `None` the iterator will be endless.
+    ///
+    /// # Returns
+    ///
+    /// An instance of a [`WordsIterator`].
+    ///
+    /// # Examples
+    ///
+    /// Creates an iterator with `max_len` = `2` starting from "01" for a given alphabet:
+    ///
+    /// ```rust
+    /// use allwords::{Alphabet};
+    ///
+    /// let alphabet = Alphabet::from_chars_in_str("01").unwrap();
+    /// let iterator = alphabet.all_words_starting_from(String::from("01"), Some(2));
+    /// let words: Vec<String> = iterator.collect();
+    /// assert_eq!(words, vec!["01", "10", "11"]);
+    /// ```
     pub fn all_words_starting_from(
         &self,
         start_word: String,

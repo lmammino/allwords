@@ -12,8 +12,8 @@ A rust library that allows to generate words over a given alphabet
 TODO: BEFORE PUBLISH
 
   - [ ] expand README with a better description and more examples
-  - [ ] cleanup clippy errors
-  - [ ] make CI work
+  - [X] cleanup clippy errors
+  - [X] make CI work
   - [ ] add publish workflow
   - [ ] add code docs
 
