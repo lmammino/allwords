@@ -1,7 +1,7 @@
 [package]
 name = "allwords"
 version = "0.1.0"
-description = ""
+description = "Generate all the words over a given alphabet"
 keywords = ["iterator", "fuzzy", "brute-force", "words", "alphabet"]
 categories = ["data-structures", "encoding", "text-processing", "value-formatting"]
 repository = "https://github.com/lmammino/allwords"
