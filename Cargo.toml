@@ -1,7 +1,13 @@
 [package]
 name = "allwords"
 version = "0.1.0"
-authors = ["Luciano <lucianomammino@gmail.com>"]
+description = ""
+keywords = ["generator", "random", "iterator", "bruteforce", "fuzzy", "brute-force", "words", "alphabet"]
+categories = ["data-structures", "encoding", "text-processing", "value-formatting"]
+repository = "https://github.com/lmammino/allwords"
+documentation = "https://github.com/lmammino/allwords"
+readme = "README.md"
+authors = ["Luciano Mammino"]
 edition = "2018"
 license = "MIT"
 

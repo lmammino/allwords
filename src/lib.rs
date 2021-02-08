@@ -1,5 +1,15 @@
 //! `allwords` is a crate that allows you to generate words over a given alphabet.
 //!
+//! Word generation can be useful in several scenarios:
+//!
+//!  - Pseudo-random data generation (e.g. testing / mocking)
+//!  - Brute forcing of keys / passwords
+//!  - Id or Serial number generation
+//!
+//! The basic idea for using this library is that you create an [`Alphabet`] with a set of
+//! characters and then you can use it to generate a [`WordsIterator`]. You can use the iterator
+//! to generate all the possible words over the alphabet.
+//!
 //! For instance if you want to generate all the possible words containing `"a"`, `"b"`, `"c"` with
 //! a maximum length of 3 chars:
 //!
@@ -22,9 +32,6 @@
 //!
 //! assert_eq!(words, expected_words);
 //! ```
-//!
-//! This is something that can be useful in a number of situations, for instance
-//! pseudo-random data generation or brute forcing.
 
 use std::collections::{HashMap, VecDeque};
 use std::str;

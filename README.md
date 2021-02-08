@@ -5,26 +5,79 @@
 [![crates.io badge](https://img.shields.io/crates/v/allwords.svg)](https://crates.io/crates/allwords)
 [![Documentation](https://docs.rs/allwords/badge.svg)](https://docs.rs/allwords)
 
-A rust library that allows to generate words over a given alphabet
+`allwords` is a Rust crate that allows you to generate words over a given alphabet.
 
-## ⚠️  Work in progress
+Word generation can be useful in several scenarios:
 
-TODO: BEFORE PUBLISH
-
-  - [ ] expand README with a better description and more examples
-  - [X] cleanup clippy errors
-  - [X] make CI work
-  - [ ] add publish workflow
-  - [ ] add code docs
+  - Pseudo-random data generation (e.g. testing / mocking)
+  - Brute forcing of keys / passwords
+  - Id or Serial number generation
 
 
-## Usage
+## Install
+
+To install the library add the following lines to your `Cargo.toml`
+
+```toml
+[dependencies]
+allwords = "0"
+```
+
+Or, if you have [`cargo add`](https://github.com/killercup/cargo-edit), you can run the following command:
+
+```bash
+cargo add allwords@0
+```
+
+
+## Sample Usage
+
+The basic idea for using this library is that you create an [`Alphabet`](https://docs.rs/allwords/latest/struct.Alphabet.html) with a set of
+characters and then you can use it to generate a [`WordsIterator`](https://docs.rs/allwords/latest/allwords/struct.WordsIterator.html). You can use the iterator
+to generate all the possible words over the alphabet.
+
+For instance if you want to generate all the possible words containing `"a"`, `"b"`, `"c"` with
+a maximum length of 3 chars:
 
 ```rust
-use allwords::Alphabet;
+use allwords::{Alphabet};
 
-let alphabet = Alphabet::from_chars_string("01").unwrap();
-let words: Vec<String> = a.all_words_with_len(3, Some(3)).collect();
+let a = Alphabet::from_chars_in_str("abc").unwrap();
 
-println!("{:?}", words); // ["000", "001", "010", "011", "100", "101", "110", "111"]
+let words: Vec<String> = a.all_words(Some(3)).collect();
+
+let expected_words: Vec<String> = [
+    "a", "b", "c",
+    "aa", "ab", "ac", "ba", "bb", "bc", "ca", "cb", "cc",
+    "aaa", "aab", "aac", "aba", "abb", "abc", "aca", "acb", "acc",
+    "baa", "bab", "bac", "bba", "bbb", "bbc", "bca", "bcb", "bcc",
+    "caa", "cab", "cac", "cba", "cbb", "cbc", "cca", "ccb", "ccc"]
+    .iter()
+    .map(|s| s.to_string())
+    .collect();
+
+assert_eq!(words, expected_words);
 ```
+
+### WordsIterator
+
+Once you create an alphabet `a`, there are 4 different ways to get an iterator:
+
+  - [`a.all_words(max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words) - Creates an iterator that will generate all the words for a given alphabet. You can optionally specifify a maximum length, after which, the iterator will terminate.
+  - [`a.all_words_unbound()`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_unbound) - A shortcut for creating an unbound (endless) iterator for the given alphabet.
+  - [`a.all_words_starting_from(start_word, max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_starting_from) - Creates an iterator that will generate all the words for a given alphabet starting from a given word.
+  - [`a.all_words_with_len(start_len, max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_with_len) - Creates an iterator that will generate all the words for a given alphabet starting from the first word with a given minimum length.
+
+Consult the [crate documentation](https://docs.rs/allwords/latest/) for more details and examples.
+
+
+## Contributing
+
+Everyone is very welcome to contribute to this project.
+You can contribute just by submitting bugs or suggesting improvements by
+[opening an issue on GitHub](https://github.com/lmammino/allwords/issues).
+
+
+## License
+
+Licensed under [MIT License](LICENSE). © Luciano Mammino.
