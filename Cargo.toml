@@ -2,7 +2,7 @@
 name = "allwords"
 version = "0.1.0"
 description = ""
-keywords = ["generator", "random", "iterator", "bruteforce", "fuzzy", "brute-force", "words", "alphabet"]
+keywords = ["iterator", "fuzzy", "brute-force", "words", "alphabet"]
 categories = ["data-structures", "encoding", "text-processing", "value-formatting"]
 repository = "https://github.com/lmammino/allwords"
 documentation = "https://github.com/lmammino/allwords"
