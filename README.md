@@ -1,7 +1,7 @@
 # allwords 🦀
 
 [![build badge](https://github.com/lmammino/allwords/workflows/Rust/badge.svg)](https://github.com/lmammino/allwords/actions?query=workflow%3ARust)
-[![codecov](https://codecov.io/gh/lmammino/allwords/branch/master/graph/badge.svg)](https://codecov.io/gh/lmammino/allwords)
+[![codecov](https://codecov.io/gh/lmammino/allwords/branch/main/graph/badge.svg?token=4CNbvgaDc1)](https://codecov.io/gh/lmammino/allwords)
 [![crates.io badge](https://img.shields.io/crates/v/allwords.svg)](https://crates.io/crates/allwords)
 [![Documentation](https://docs.rs/allwords/badge.svg)](https://docs.rs/allwords)
 
