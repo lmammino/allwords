@@ -32,7 +32,7 @@ cargo add allwords@0
 
 ## Sample Usage
 
-The basic idea for using this library is that you create an [`Alphabet`](https://docs.rs/allwords/latest/struct.Alphabet.html) with a set of
+The basic idea for using this library is that you create an [`Alphabet`](https://docs.rs/allwords/latest/allwords/struct.Alphabet.html) with a set of
 characters and then you can use it to generate a [`WordsIterator`](https://docs.rs/allwords/latest/allwords/struct.WordsIterator.html). You can use the iterator
 to generate all the possible words over the alphabet.
 
@@ -63,10 +63,10 @@ assert_eq!(words, expected_words);
 
 Once you create an alphabet `a`, there are 4 different ways to get an iterator:
 
-  - [`a.all_words(max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words) - Creates an iterator that will generate all the words for a given alphabet. You can optionally specifify a maximum length, after which, the iterator will terminate.
-  - [`a.all_words_unbound()`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_unbound) - A shortcut for creating an unbound (endless) iterator for the given alphabet.
-  - [`a.all_words_starting_from(start_word, max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_starting_from) - Creates an iterator that will generate all the words for a given alphabet starting from a given word.
-  - [`a.all_words_with_len(start_len, max_len)`](https://docs.rs/allwords/latest/struct.Alphabet.html#method.all_words_with_len) - Creates an iterator that will generate all the words for a given alphabet starting from the first word with a given minimum length.
+  - [`a.all_words(max_len)`](https://docs.rs/allwords/latest/allwords/struct.Alphabet.html#method.all_words) - Creates an iterator that will generate all the words for a given alphabet. You can optionally specifify a maximum length, after which, the iterator will terminate.
+  - [`a.all_words_unbound()`](https://docs.rs/allwords/latest/allwords/struct.Alphabet.html#method.all_words_unbound) - A shortcut for creating an unbound (endless) iterator for the given alphabet.
+  - [`a.all_words_starting_from(start_word, max_len)`](https://docs.rs/allwords/latest/allwords/struct.Alphabet.html#method.all_words_starting_from) - Creates an iterator that will generate all the words for a given alphabet starting from a given word.
+  - [`a.all_words_with_len(start_len, max_len)`](https://docs.rs/allwords/latest/allwords/struct.Alphabet.html#method.all_words_with_len) - Creates an iterator that will generate all the words for a given alphabet starting from the first word with a given minimum length.
 
 Consult the [crate documentation](https://docs.rs/allwords/latest/) for more details and examples.
 
